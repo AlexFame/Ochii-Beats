@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy": "npx vercel@latest deploy --prod --yes"
+    "deploy": "NEXT_PUBLIC_BUILD=$(git rev-parse --short HEAD || date +%s) npx vercel@latest deploy --prod --yes"
   },
   "dependencies": {
     "next": "16.0.0",
