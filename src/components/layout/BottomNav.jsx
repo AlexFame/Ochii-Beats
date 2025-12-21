@@ -5,7 +5,6 @@ import { NavLink } from 'react-router-dom';
 const BottomNav = () => {
   const navItems = [
     { icon: Home, label: 'Feed', path: '/' },
-    { icon: Upload, label: 'Upload', path: '/upload' },
     { icon: Search, label: 'Search', path: '/search' },
     { icon: Library, label: 'Library', path: '/library' },
     { icon: User, label: 'Profile', path: '/profile' },

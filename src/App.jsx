@@ -5,7 +5,7 @@ import HomePage from './pages/HomePage';
 import { AudioProvider } from './context/AudioContext';
 import { CartProvider } from './context/CartContext';
 import CartPage from './pages/CartPage';
-import UploadPage from './pages/UploadPage';
+import ProfilePage from './pages/ProfilePage';
 import { useTelegram } from './hooks/useTelegram';
 
 import ErrorBoundary from './components/ErrorBoundary';
@@ -23,6 +23,7 @@ function App() {
                 <Route index element={<HomePage />} />
                 <Route path="cart" element={<CartPage />} />
                 <Route path="upload" element={<UploadPage />} />
+                <Route path="profile" element={<ProfilePage />} />
               </Route>
             </Routes>
           </Router>

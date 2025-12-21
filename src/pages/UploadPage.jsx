@@ -3,6 +3,16 @@ import { Upload, Music, FileAudio, FolderArchive, Image as ImageIcon, X, Check, 
 import { supabase } from '../lib/supabase';
 
 const UploadPage = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // Check for admin session on mount
+  useEffect(() => {
+    const adminSession = localStorage.getItem('isAdmin');
+    if (adminSession === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+  
   const [coverFile, setCoverFile] = useState(null);
   const [mp3File, setMp3File] = useState(null);
   const [wavFile, setWavFile] = useState(null);
@@ -17,7 +27,17 @@ const UploadPage = () => {
   });
   
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState(null); // 'success' | 'error'
+  const [uploadStatus, setUploadStatus] = useState(null);
+
+  if (!isAuthenticated) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center' }}>
+        <h2 style={{ marginBottom: '16px' }}>Access Denied</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>Please log in via the Profile page.</p>
+        <a href="/profile" style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 'bold' }}>Go to Profile</a>
+      </div>
+    );
+  }
 
   const handleDrop = useCallback((e, type) => {
     e.preventDefault();
