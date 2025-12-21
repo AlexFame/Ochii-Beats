@@ -100,7 +100,7 @@ const HeroPlayer = ({ beat, playlist = [] }) => {
           width: 'calc(100% + 32px)', // Break container padding
           marginLeft: '-16px',
           marginRight: '-16px',
-          marginTop: '0', // Adjust if needed to touch navbar
+          marginTop: '-20px', // Pull up to cover Layout padding
           aspectRatio: '1',
           borderBottomLeftRadius: '32px',
           borderBottomRightRadius: '32px',
