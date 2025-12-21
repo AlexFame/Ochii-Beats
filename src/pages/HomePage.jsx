@@ -57,7 +57,13 @@ const HomePage = () => {
       if (!data || data.length === 0) {
         setBeats(MOCK_BEATS);
       } else {
-        setBeats(data);
+        // Map Supabase columns to app structure
+        const formattedBeats = data.map(beat => ({
+          ...beat,
+          audio: beat.audio_url,
+          cover: beat.cover_url
+        }));
+        setBeats(formattedBeats);
       }
     } catch (error) {
       console.error('Error fetching beats:', error);
