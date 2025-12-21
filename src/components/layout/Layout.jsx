@@ -22,18 +22,9 @@ const Layout = () => {
         <Outlet />
       </main>
       
-      {/* Fixed Elements */}
-      <div style={{ 
-        position: 'fixed', 
-        bottom: 0, 
-        left: 0, 
-        right: 0, 
-        zIndex: 100 
-      }}>
-        {/* Hide Mini Player on Home Page since Hero Player is active there */}
-        {!isHome && <AudioPlayerBar />}
-        <BottomNav />
-      </div>
+      {/* Hide Mini Player on Home Page since Hero Player is active there */}
+      {!isHome && <AudioPlayerBar />}
+      <BottomNav />
     </div>
   );
 };
