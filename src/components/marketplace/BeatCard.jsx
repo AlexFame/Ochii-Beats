@@ -23,81 +23,120 @@ const BeatCard = ({ beat, playlist = [] }) => {
   
   return (
     <>
-      <div className="glass-panel" style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: '12px',
-        gap: '12px',
-        borderRadius: 'var(--radius-md)',
-        transition: 'transform 0.1s ease',
-      }}>
-        {/* Cover / Play Button */}
-        <div 
-          onClick={() => playTrack(beat, playlist)}
-          style={{
-            position: 'relative',
-            width: '64px',
-            height: '64px',
-            borderRadius: '8px',
-            backgroundImage: `url(${beat.cover})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            cursor: 'pointer',
-            flexShrink: 0
-          }}
-        >
+      <div 
+        className="glass-panel" 
+        onClick={() => playTrack(beat, playlist)}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '12px',
+          gap: '16px',
+          borderRadius: '20px',
+          marginBottom: '12px',
+          cursor: 'pointer',
+          border: '1px solid rgba(255,255,255,0.05)',
+          background: isCurrent ? 'rgba(124, 58, 237, 0.15)' : 'var(--glass-bg)',
+          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
+        {/* Active Glow Indicator */}
+        {isCurrent && (
+          <div style={{
+            position: 'absolute',
+            left: 0, top: 0, bottom: 0,
+            width: '4px',
+            background: 'var(--accent-primary)',
+            boxShadow: '0 0 12px var(--accent-primary)'
+          }} />
+        )}
+
+        {/* Cover Art */}
+        <div style={{
+          position: 'relative',
+          width: '56px',
+          height: '56px',
+          borderRadius: '14px',
+          backgroundImage: `url(${beat.cover})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          flexShrink: 0,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
+        }}>
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: 'rgba(0,0,0,0.3)',
-            borderRadius: '8px',
+            background: isCurrent ? 'rgba(0,0,0,0.4)' : 'transparent',
+            borderRadius: '14px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            transition: 'background 0.2s'
           }}>
-            {isCurrent && isPlaying ? (
-              <Pause size={24} fill="white" color="white" />
-            ) : (
-              <Play size={24} fill="white" color="white" style={{ marginLeft: '2px' }} />
+            {isCurrent && (
+              isPlaying ? <Pause size={20} fill="white" color="white" /> : <Play size={20} fill="white" color="white" />
             )}
           </div>
         </div>
         
         {/* Info */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <h3 style={{ 
-            fontSize: '16px', 
+            fontSize: '15px', 
             fontWeight: 600, 
-            marginBottom: '4px',
+            color: isCurrent ? 'var(--accent-secondary)' : 'white',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
-            textOverflow: 'ellipsis'
+            textOverflow: 'ellipsis',
+            letterSpacing: '0.2px'
           }}>
             {beat.title}
           </h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-            <span style={{ fontWeight: 500 }}>{beat.bpm} BPM</span>
-            <span>•</span>
-            <span style={{ fontWeight: 500 }}>{beat.key}</span>
-            <span>•</span>
-            <span className="text-gradient" style={{ fontWeight: 600 }}>#{beat.tags[0]}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+            <span style={{ 
+              background: 'rgba(255,255,255,0.1)', 
+              padding: '2px 6px', 
+              borderRadius: '6px', 
+              fontSize: '11px',
+              fontWeight: 500
+            }}>
+              {beat.bpm} BPM
+            </span>
+            <span style={{ opacity: 0.5 }}>|</span>
+            <span style={{
+               background: 'rgba(255,255,255,0.1)',
+               padding: '2px 6px',
+               borderRadius: '6px',
+               fontSize: '11px', 
+               fontWeight: 500
+            }}>
+              {beat.key}
+            </span>
           </div>
         </div>
         
-        {/* Action */}
+        {/* Buy Button */}
         <button 
           onClick={handleBuy}
           style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            padding: '8px 12px',
-            borderRadius: '20px',
+            background: 'var(--accent-primary)',
+            padding: '8px 14px',
+            borderRadius: '14px',
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
             fontSize: '13px',
             fontWeight: 600,
-            color: 'var(--accent-primary)'
-          }}>
+            color: 'white',
+            boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)',
+            transition: 'transform 0.2s',
+            zIndex: 2
+          }}
+          onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+          onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        >
           <span>${beat.price}</span>
           <ShoppingCart size={14} />
         </button>
