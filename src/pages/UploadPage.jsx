@@ -1,6 +1,32 @@
+import React, { useState, useCallback } from 'react';
+import { Upload, Music, Image as ImageIcon, X, Check, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-// ... (inside component)
+const UploadPage = () => {
+  const [coverFile, setCoverFile] = useState(null);
+  const [audioFile, setAudioFile] = useState(null);
+  const [metadata, setMetadata] = useState({
+    title: '',
+    bpm: '',
+    key: '',
+    price: '',
+    tags: ''
+  });
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState(null); // 'success' | 'error'
+
+  const handleDrop = useCallback((e, type) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (type === 'cover' && file?.type.startsWith('image/')) setCoverFile(file);
+    if (type === 'audio' && file?.type.startsWith('audio/')) setAudioFile(file);
+  }, []);
+
+  const handleFileSelect = (e, type) => {
+    const file = e.target.files[0];
+    if (type === 'cover') setCoverFile(file);
+    if (type === 'audio') setAudioFile(file);
+  };
 
   const handleSubmit = async () => {
     if (!coverFile || !audioFile || !metadata.title || !metadata.price) {
@@ -71,7 +97,7 @@ import { supabase } from '../lib/supabase';
   };
 
   return (
-    <div style={{ paddingBottom: '100px', minHeight: '100vh' }}>
+    <div style={{ paddingBottom: '100px', minHeight: '100vh', padding: '16px' }}>
       <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '24px' }}>Upload New Beat</h1>
 
       {/* Cover Upload Zone */}
