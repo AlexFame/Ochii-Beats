@@ -355,30 +355,32 @@ const UploadSection = ({ title, file, onSelect, onRemove, accept, icon, required
 );
 
 const LinkInput = ({ icon, label, value, onChange, placeholder }) => (
-  <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <label style={{ marginLeft: '4px', fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600 }}>{label}</label>
     <div style={{ 
-      width: '40px', height: '40px', borderRadius: '12px', 
-      background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      color: 'var(--text-secondary)'
+      display: 'flex', gap: '12px', alignItems: 'center',
+      background: 'var(--bg-secondary)',
+      border: '1px solid var(--glass-border)',
+      borderRadius: '16px',
+      padding: '4px 4px 4px 16px',
+      height: '56px',
+      transition: 'all 0.2s'
     }}>
-      {icon}
-    </div>
-    <div style={{ flex: 1 }}>
-      <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600 }}>
-        {label}
-      </label>
+      <div style={{ color: 'var(--text-secondary)' }}>
+        {icon}
+      </div>
       <input
         type="text"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
         style={{
-          width: '100%',
+          flex: 1,
+          height: '100%',
           background: 'transparent',
           border: 'none',
-          color: 'var(--accent-cyan)',
+          color: 'white',
           fontSize: '15px',
-          fontWeight: 500,
           outline: 'none',
           padding: 0
         }}
@@ -388,13 +390,8 @@ const LinkInput = ({ icon, label, value, onChange, placeholder }) => (
 );
 
 const FloatingInput = ({ label, value, onChange, type = "text", placeholder }) => (
-  <div style={{ position: 'relative', paddingTop: '10px' }}>
-    <label style={{ 
-      position: 'absolute', top: 0, left: 0, 
-      fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' 
-    }}>
-      {label}
-    </label>
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+    <label style={{ marginLeft: '4px', fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600 }}>{label}</label>
     <input
       type={type}
       value={value}
@@ -402,18 +399,25 @@ const FloatingInput = ({ label, value, onChange, type = "text", placeholder }) =
       placeholder={placeholder}
       style={{
         width: '100%',
-        padding: '8px 0',
-        background: 'transparent',
-        border: 'none',
-        borderBottom: '1px solid rgba(255,255,255,0.1)',
+        height: '56px',
+        padding: '0 16px',
+        background: 'var(--bg-secondary)',
+        border: '1px solid var(--glass-border)',
+        borderRadius: '16px',
         color: 'white',
-        fontSize: '16px',
+        fontSize: '15px',
         fontWeight: 500,
         outline: 'none',
-        transition: 'border-color 0.3s'
+        transition: 'all 0.2s'
       }}
-      onFocus={(e) => e.target.style.borderBottomColor = 'var(--accent-primary)'}
-      onBlur={(e) => e.target.style.borderBottomColor = 'rgba(255,255,255,0.1)'}
+      onFocus={(e) => {
+        e.target.style.borderColor = 'var(--accent-primary)';
+        e.target.style.background = 'rgba(124, 58, 237, 0.05)';
+      }}
+      onBlur={(e) => {
+        e.target.style.borderColor = 'var(--glass-border)';
+        e.target.style.background = 'var(--bg-secondary)';
+      }}
     />
   </div>
 );
