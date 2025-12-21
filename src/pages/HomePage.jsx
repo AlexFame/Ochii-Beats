@@ -69,13 +69,15 @@ const HomePage = () => {
       {/* Hero Section */}
       <HeroPlayer beat={featuredBeat} />
 
+      {/* 
       <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px', marginTop: '16px' }}>More Beats</h3>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {MOCK_BEATS.map(beat => (
           <BeatCard key={beat.id} beat={beat} />
         ))}
-      </div>
+      </div> 
+      */}
     </div>
   );
 };

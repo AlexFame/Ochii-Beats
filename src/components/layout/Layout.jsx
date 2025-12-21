@@ -26,7 +26,8 @@ const Layout = () => {
         right: 0, 
         zIndex: 100 
       }}>
-        <AudioPlayerBar />
+        {/* Hide Mini Player on Home Page since Hero Player is active there */}
+        {!isHome && <AudioPlayerBar />}
         <BottomNav />
       </div>
     </div>
