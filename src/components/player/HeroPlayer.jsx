@@ -1,17 +1,35 @@
-import React, { useState } from 'react';
-import { Play, Pause, SkipBack, SkipForward, ShoppingCart, Share2, Heart, RefreshCw } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Play, Pause, SkipBack, SkipForward, ShoppingCart, Share2, Heart, RefreshCw, Volume2, Volume1, VolumeX } from 'lucide-react';
+import { motion, useAnimation, PanInfo } from 'framer-motion';
 import { useAudio } from '../../context/AudioContext';
 import { useCart } from '../../context/CartContext';
 import LicenseModal from '../marketplace/LicenseModal';
 
 const HeroPlayer = ({ beat }) => {
-  const { currentTrack, isPlaying, playTrack, togglePlay } = useAudio();
+  const { 
+    currentTrack, isPlaying, playTrack, togglePlay, 
+    currentTime, duration, seek, isLooping, toggleLoop,
+    volume, setVolume, playNext, playPrev 
+  } = useAudio();
+  
   const { addToCart } = useCart();
   const [showLicense, setShowLicense] = useState(false);
+  const [isSeeking, setIsSeeking] = useState(false);
+  const [seekValue, setSeekValue] = useState(0);
+
+  // Animation controls for swipe
+  const controls = useAnimation();
 
   // If this beat is playing, show its state. Otherwise static.
   const isCurrent = currentTrack?.id === beat.id;
   const activePlaying = isCurrent && isPlaying;
+  
+  // Update local seek value when not manually seeking
+  useEffect(() => {
+    if (!isSeeking) {
+      setSeekValue(currentTime);
+    }
+  }, [currentTime, isSeeking]);
 
   const handlePlayClick = () => {
     if (isCurrent) {
@@ -30,33 +48,71 @@ const HeroPlayer = ({ beat }) => {
     setShowLicense(false);
   };
 
+  // Format time (mm:ss)
+  const formatTime = (time) => {
+    if (!time) return '0:00';
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
+  const handleSeekChange = (e) => {
+    setSeekValue(Number(e.target.value));
+  };
+
+  const handleSeekStart = () => setIsSeeking(true);
+  
+  const handleSeekEnd = () => {
+    seek(seekValue);
+    setIsSeeking(false);
+  };
+
+  const handleDragEnd = (event, info) => {
+    const threshold = 100;
+    if (info.offset.x < -threshold) {
+      playNext();
+    } else if (info.offset.x > threshold) {
+      playPrev();
+    }
+    controls.start({ x: 0 });
+  };
+
   return (
     <div style={{ 
       display: 'flex', 
       flexDirection: 'column', 
       justifyContent: 'space-between',
       paddingBottom: '24px',
-      minHeight: '85vh' // Ensure it takes up most of the screen initially
+      minHeight: '85vh'
     }}>
       
-      {/* Cover Art - Flex Grow to fill space */}
-      <div style={{
-        width: '100%',
-        aspectRatio: '1',
-        borderRadius: '24px',
-        overflow: 'hidden',
-        marginBottom: '20px',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
-        position: 'relative',
-      }}>
+      {/* Cover Art - Swipe enabled */}
+      <motion.div 
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        onDragEnd={handleDragEnd}
+        animate={controls}
+        style={{
+          width: '100%',
+          aspectRatio: '1',
+          borderRadius: '24px',
+          overflow: 'hidden',
+          marginBottom: '20px',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+          position: 'relative',
+          cursor: 'grab',
+          touchAction: 'none' 
+        }}>
         <div style={{
           width: '100%',
           height: '100%',
           backgroundImage: `url(${beat.cover})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          pointerEvents: 'none' // Let drag handle events
         }} />
-      </div>
+      </motion.div>
 
       {/* Info & Controls Area */}
       <div style={{ flexShrink: 0, width: '100%' }}>
@@ -72,32 +128,41 @@ const HeroPlayer = ({ beat }) => {
           </div>
         </div>
 
-        {/* Waveform Visualizer */}
-        <div style={{ 
-          width: '100%', 
-          height: '32px', 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '3px',
-          marginBottom: '20px',
-          opacity: 0.6
-        }}>
-          {Array.from({ length: 45 }).map((_, i) => (
-            <div key={i} style={{ 
-              flex: 1, 
-              background: i < 15 ? 'var(--text-primary)' : 'var(--glass-border)',
-              height: `${20 + Math.random() * 80}%`, 
+        {/* Improved Progress Bar (replacing waveform) */}
+        <div style={{ marginBottom: '24px' }}>
+          <input
+            type="range"
+            min="0"
+            max={duration || 100}
+            value={seekValue}
+            onChange={handleSeekChange}
+            onMouseDown={handleSeekStart}
+            onTouchStart={handleSeekStart}
+            onMouseUp={handleSeekEnd}
+            onTouchEnd={handleSeekEnd}
+            style={{
+              width: '100%',
+              height: '4px',
+              background: `linear-gradient(to right, var(--text-primary) ${(seekValue / (duration || 1)) * 100}%, var(--glass-border) 0%)`,
               borderRadius: '2px',
-            }} />
-          ))}
+              appearance: 'none',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+            className="seek-slider" 
+          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+            <span>{formatTime(seekValue)}</span>
+            <span>{formatTime(duration)}</span>
+          </div>
         </div>
 
         {/* Player Controls Row */}
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '24px', marginBottom: '20px' }}>
-          <button style={{ 
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '24px', marginBottom: '24px' }}>
+          <button onClick={playPrev} style={{ 
             width: '48px', height: '48px', borderRadius: '12px', 
-            background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', // Lighter background
-            color: 'white'
+            background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+            color: 'white', backdropFilter: 'blur(10px)'
           }}>
             <SkipBack size={24} fill="currentColor" />
           </button>
@@ -105,10 +170,10 @@ const HeroPlayer = ({ beat }) => {
           <button 
             onClick={handlePlayClick}
             style={{ 
-              width: '64px', 
-              height: '64px', 
-              borderRadius: '20px', 
-              background: 'white', // Keep play button white for max contrast
+              width: '72px', 
+              height: '72px', 
+              borderRadius: '24px', 
+              background: 'white', 
               color: 'black',
               display: 'flex', 
               alignItems: 'center', 
@@ -123,10 +188,10 @@ const HeroPlayer = ({ beat }) => {
             )}
           </button>
 
-          <button style={{ 
+          <button onClick={playNext} style={{ 
             width: '48px', height: '48px', borderRadius: '12px', 
-            background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', // Lighter background
-            color: 'white'
+            background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+            color: 'white', backdropFilter: 'blur(10px)'
           }}>
              <SkipForward size={24} fill="currentColor" />
           </button>
@@ -139,15 +204,15 @@ const HeroPlayer = ({ beat }) => {
             width: '100%',
             height: '56px',
             borderRadius: '28px', 
-            background: 'var(--accent-primary)', // Purple accent
+            background: 'var(--accent-primary)', 
             color: 'white',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '18px',
             fontWeight: 700,
-            boxShadow: '0 4px 20px rgba(124, 58, 237, 0.4)', // Purple glow
-            marginBottom: '16px',
+            boxShadow: '0 4px 20px rgba(124, 58, 237, 0.4)',
+            marginBottom: '20px',
             textTransform: 'uppercase',
             letterSpacing: '0.5px'
           }}
@@ -155,18 +220,33 @@ const HeroPlayer = ({ beat }) => {
           Buy from ${beat.price}
         </button>
 
-        {/* Secondary Actions (Loop, Vol) - Optional, mimicking screenshot layout */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 8px' }}>
-           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
-              <RefreshCw size={16} />
-              <span style={{ fontSize: '13px' }}>Loop</span>
-           </div>
-           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
-              <span style={{ fontSize: '13px' }}>Vol</span>
-              <div style={{ width: '80px', height: '4px', background: 'var(--bg-tertiary)', borderRadius: '2px', position: 'relative' }}>
-                <div style={{ width: '70%', height: '100%', background: 'white', borderRadius: '2px' }} />
-                <div style={{ width: '12px', height: '12px', background: 'white', borderRadius: '50%', position: 'absolute', top: '-4px', left: '65%' }} />
-              </div>
+        {/* Secondary Actions (Loop, Vol) */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 12px' }}>
+           <button 
+              onClick={toggleLoop}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', color: isLooping ? 'var(--accent-primary)' : 'var(--text-secondary)', transition: 'color 0.2s' }}>
+              <RefreshCw size={18} />
+              <span style={{ fontSize: '13px', fontWeight: 500 }}>Loop</span>
+           </button>
+
+           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {volume === 0 ? <VolumeX size={18} color="var(--text-secondary)" /> : <Volume2 size={18} color="var(--text-secondary)" />}
+              <input 
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={volume}
+                onChange={(e) => setVolume(parseFloat(e.target.value))}
+                style={{
+                  width: '80px',
+                  height: '4px',
+                  background: 'var(--bg-tertiary)',
+                  borderRadius: '2px',
+                  appearance: 'none', // Reset default appearance
+                  cursor: 'pointer'
+                }}
+              />
            </div>
         </div>
 
@@ -178,6 +258,25 @@ const HeroPlayer = ({ beat }) => {
         beat={beat}
         onSelect={handleSelectLicense}
       />
+      
+      <style>{`
+        /* Custom default range input styling */
+        input[type=range]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          height: 12px;
+          width: 12px;
+          border-radius: 50%;
+          background: #fff;
+          margin-top: -4px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+          width: 100%;
+          height: 4px;
+          cursor: pointer;
+          background: transparent; 
+          border-radius: 2px;
+        }
+      `}</style>
     </div>
   );
 };

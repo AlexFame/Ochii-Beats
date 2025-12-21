@@ -63,6 +63,12 @@ const HomePage = () => {
     }
   }, [currentTrack]);
 
+  const handleHeroPlay = (beat) => {
+    // Pass the full list so "Next" works
+    // Logic inside HeroPlayer will handle this if we pass the list as prop or context
+    // But better to update HeroPlayer to accept playlist or just updating it here
+  };
+
   return (
     <div style={{ paddingBottom: '20px' }}>
       
@@ -73,7 +79,7 @@ const HomePage = () => {
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '20px' }}>
         {MOCK_BEATS.map(beat => (
-          <BeatCard key={beat.id} beat={beat} />
+          <BeatCard key={beat.id} beat={beat} playlist={MOCK_BEATS} />
         ))}
       </div>
     </div>

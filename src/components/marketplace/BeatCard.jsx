@@ -4,7 +4,7 @@ import { useAudio } from '../../context/AudioContext';
 import { useCart } from '../../context/CartContext';
 import LicenseModal from './LicenseModal';
 
-const BeatCard = ({ beat }) => {
+const BeatCard = ({ beat, playlist = [] }) => {
   const { currentTrack, isPlaying, playTrack } = useAudio();
   const { addToCart } = useCart();
   const [showLicense, setShowLicense] = useState(false);
@@ -33,7 +33,7 @@ const BeatCard = ({ beat }) => {
       }}>
         {/* Cover / Play Button */}
         <div 
-          onClick={() => playTrack(beat)}
+          onClick={() => playTrack(beat, playlist)}
           style={{
             position: 'relative',
             width: '64px',
