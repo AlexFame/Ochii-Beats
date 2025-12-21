@@ -21,8 +21,8 @@ const HeroCover = ({ beat, onNext, onPrev }) => {
       dragElastic={0.2}
       onDragEnd={handleDragEnd}
       animate={controls}
-        width: 'calc(100% + 32px)',
-        margin: '0 -16px 24px -16px',
+        width: '100%',
+        margin: '0 0 24px 0',
         aspectRatio: '1',
         borderBottomLeftRadius: '32px',
         borderBottomRightRadius: '32px',
@@ -32,10 +32,7 @@ const HeroCover = ({ beat, onNext, onPrev }) => {
         cursor: 'grab',
         touchAction: 'none',
         zIndex: 0,
-        flexShrink: 0,
-        transform: 'none',
-        left: 'auto',
-        right: 'auto'
+        flexShrink: 0
       }}>
       <div style={{
         width: '100%',

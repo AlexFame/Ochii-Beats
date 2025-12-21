@@ -88,7 +88,7 @@ const HomePage = () => {
     <div style={{ paddingBottom: '20px' }}>
       <HeroPlayer beat={heroBeat} playlist={beats} />
       
-      <div className="container" style={{ marginTop: '0', padding: '0 16px' }}>
+      <div className="container" style={{ marginTop: '0', padding: '0 16px', maxWidth: '100%' }}>
         <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '12px', marginTop: '0' }}>More Beats</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '20px' }}>
           {beats.slice(1).map(beat => (
