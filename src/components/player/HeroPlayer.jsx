@@ -12,7 +12,7 @@ const HeroPlayer = ({ beat, playlist = [] }) => {
       flexDirection: 'column', 
       justifyContent: 'flex-start',
       paddingBottom: '24px',
-      minHeight: '85vh',
+      minHeight: 'auto',
       width: '100%'
     }}>
       
