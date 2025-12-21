@@ -89,6 +89,7 @@ const HeroPlayer = ({ beat, playlist = [] }) => {
     }}>
       
       {/* Cover Art - Swipe enabled */}
+      {/* Cover Art - Swipe enabled */}
       <motion.div 
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
@@ -96,15 +97,20 @@ const HeroPlayer = ({ beat, playlist = [] }) => {
         onDragEnd={handleDragEnd}
         animate={controls}
         style={{
-          width: '100%',
+          width: 'calc(100% + 32px)', // Break container padding
+          marginLeft: '-16px',
+          marginRight: '-16px',
+          marginTop: '0', // Adjust if needed to touch navbar
           aspectRatio: '1',
-          borderRadius: '24px',
+          borderBottomLeftRadius: '32px',
+          borderBottomRightRadius: '32px',
           overflow: 'hidden',
-          marginBottom: '20px',
+          marginBottom: '24px',
           boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
           position: 'relative',
           cursor: 'grab',
-          touchAction: 'none' 
+          touchAction: 'none',
+          zIndex: 0
         }}>
         <div style={{
           width: '100%',
@@ -112,6 +118,17 @@ const HeroPlayer = ({ beat, playlist = [] }) => {
           backgroundImage: `url(${beat.cover})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          pointerEvents: 'none'
+        }} />
+        
+        {/* Gradient Overlay for better integration */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '40%',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
           pointerEvents: 'none'
         }} />
       </motion.div>
