@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Upload, Music, FileAudio, FolderArchive, Image as ImageIcon, X, Check, Loader2 } from 'lucide-react';
+import { Upload, Music, FileAudio, FolderArchive, Image as ImageIcon, X, Check, Loader2, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { Link } from 'react-router-dom';
 
 const UploadPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -47,9 +48,14 @@ const UploadPage = () => {
   if (!isAuthenticated) {
     return (
       <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center' }}>
-        <h2 style={{ marginBottom: '16px' }}>Access Denied</h2>
+        <h2 style={{ marginBottom: '16px', fontSize: '24px', fontWeight: 700 }}>Access Denied</h2>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>Please log in via the Profile page.</p>
-        <a href="/profile" style={{ color: 'var(--accent-primary)', textDecoration: 'none', fontWeight: 'bold' }}>Go to Profile</a>
+        <Link to="/profile" style={{ 
+          padding: '12px 24px', borderRadius: '16px',
+          background: 'var(--accent-primary)', color: 'white', fontWeight: 600 
+        }}>
+          Go to Profile
+        </Link>
       </div>
     );
   }
@@ -73,7 +79,7 @@ const UploadPage = () => {
   };
 
   const handleSubmit = async () => {
-    // Validation: Title, Price, Cover, and at least MP3 are required
+    // Validation
     if (!metadata.title || !metadata.price || !coverFile || !mp3File) {
       alert('Please fill in Title, Price, Cover Art, and MP3 file (Required)');
       return;
@@ -126,26 +132,69 @@ const UploadPage = () => {
   };
 
   return (
-    <div style={{ padding: '16px', paddingBottom: '100px', minHeight: '100vh' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '24px' }}>Upload New Beat</h1>
+    <div style={{ padding: '20px', paddingBottom: '120px', minHeight: '100vh', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
+        <Link to="/profile" style={{
+          width: '40px', height: '40px', borderRadius: '12px',
+          background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <ArrowLeft size={20} color="white" />
+        </Link>
+        <h1 style={{ fontSize: '24px', fontWeight: 800 }}>Upload Beat</h1>
+      </div>
 
       {/* Cover Upload Zone */}
       <div 
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => handleDrop(e, 'cover')}
-        style={dropZoneStyle(!!coverFile)}
+        style={{
+          width: '100%',
+          aspectRatio: '1',
+          borderRadius: '32px',
+          border: '1px dashed rgba(255,255,255,0.2)',
+          background: coverFile ? `url(${URL.createObjectURL(coverFile)}) center/cover` : 'rgba(0,0,0,0.3)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          position: 'relative', overflow: 'hidden',
+          transition: 'all 0.3s ease',
+          boxShadow: coverFile ? '0 10px 40px rgba(0,0,0,0.5)' : 'none'
+        }}
       >
         {!coverFile && (
-          <>
-            <ImageIcon size={48} color="var(--text-secondary)" style={{ marginBottom: '12px' }} />
-            <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Drag Cover Art here</p>
-          </>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ 
+              width: '64px', height: '64px', borderRadius: '20px', 
+              background: 'var(--bg-tertiary)', margin: '0 auto 16px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
+            }}>
+              <ImageIcon size={32} color="var(--text-secondary)" />
+            </div>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '15px', fontWeight: 500 }}>Tap to add Cover Art</p>
+          </div>
         )}
+        
         <input type="file" accept="image/*" onChange={(e) => handleFileSelect(e, 'cover')} style={hiddenInputStyle} />
-        {coverFile && <FilePreview file={coverFile} onRemove={() => setCoverFile(null)} type="image" />}
+        
+        {coverFile && (
+          <button 
+            onClick={(e) => { e.stopPropagation(); setCoverFile(null); }}
+            style={{
+              position: 'absolute', top: '16px', right: '16px', zIndex: 10,
+              width: '36px', height: '36px', borderRadius: '50%',
+              background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'white'
+            }}
+          >
+            <X size={18} />
+          </button>
+        )}
       </div>
 
-      {/* MP3 Upload (Required) */}
+      {/* Main Info Section */}
+      <h2 style={{ fontSize: '18px', fontWeight: 700, marginLeft: '4px', marginTop: '12px', color: 'var(--accent-secondary)' }}>Track Files</h2>
+      
+      {/* MP3 Upload */}
       <UploadSection 
         title="MP3 (Tagged/Preview)" 
         file={mp3File} 
@@ -157,88 +206,61 @@ const UploadPage = () => {
         required
       />
 
-      {/* WAV Link (Telegram) */}
-      <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-          WAV Source (Telegram Link / File ID)
-        </label>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <div style={{ 
-            width: '48px', height: '48px', borderRadius: '12px', 
-            background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' 
-          }}>
-            <FileAudio size={24} color="var(--text-secondary)" />
-          </div>
-          <input
-            type="text"
-            placeholder="Paste Telegram Link or File ID here..."
-            value={metadata.wavLink}
-            onChange={(e) => setMetadata({...metadata, wavLink: e.target.value})}
-            style={inputStyle}
-          />
-        </div>
-      </div>
-
-      {/* ZIP Link (Telegram) */}
-      <div style={{ marginBottom: '32px' }}>
-        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-          Trackouts/ZIP Source (Telegram Link / File ID)
-        </label>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <div style={{ 
-            width: '48px', height: '48px', borderRadius: '12px', 
-            background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' 
-          }}>
-            <FolderArchive size={24} color="var(--text-secondary)" />
-          </div>
-          <input
-            type="text"
-            placeholder="Paste Telegram Link or File ID here..."
-            value={metadata.zipLink}
-            onChange={(e) => setMetadata({...metadata, zipLink: e.target.value})}
-            style={inputStyle}
-          />
-        </div>
+      {/* WAV & ZIP Links */}
+      <div className="glass-panel" style={{ padding: '20px', borderRadius: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <LinkInput 
+          icon={<FileAudio size={20} />}
+          label="WAV Source (Telegram)" 
+          value={metadata.wavLink}
+          onChange={(e) => setMetadata({...metadata, wavLink: e.target.value})}
+          placeholder="Paste Link..."
+        />
+        <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)' }} />
+        <LinkInput 
+          icon={<FolderArchive size={20} />}
+          label="Trackouts Source (Telegram)" 
+          value={metadata.zipLink}
+          onChange={(e) => setMetadata({...metadata, zipLink: e.target.value})}
+          placeholder="Paste Link..."
+        />
       </div>
 
       {/* Metadata Form */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
-        <input
-          type="text"
-          placeholder="Track Title"
-          value={metadata.title}
-          onChange={(e) => setMetadata({...metadata, title: e.target.value})}
-          style={inputStyle}
+      <h2 style={{ fontSize: '18px', fontWeight: 700, marginLeft: '4px', marginTop: '12px', color: 'var(--accent-cyan)' }}>Details</h2>
+      
+      <div className="glass-panel" style={{ padding: '24px', borderRadius: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <FloatingInput 
+          label="Track Title" 
+          value={metadata.title} 
+          onChange={(e) => setMetadata({...metadata, title: e.target.value})} 
         />
+        
         <div style={{ display: 'flex', gap: '12px' }}>
-          <input
+          <FloatingInput 
+            label="BPM" 
             type="number"
-            placeholder="BPM"
-            value={metadata.bpm}
-            onChange={(e) => setMetadata({...metadata, bpm: e.target.value})}
-            style={inputStyle}
+            value={metadata.bpm} 
+            onChange={(e) => setMetadata({...metadata, bpm: e.target.value})} 
           />
-          <input
-            type="text"
-            placeholder="Key (e.g. Cm)"
-            value={metadata.key}
-            onChange={(e) => setMetadata({...metadata, key: e.target.value})}
-            style={inputStyle}
+          <FloatingInput 
+            label="Key" 
+            value={metadata.key} 
+            onChange={(e) => setMetadata({...metadata, key: e.target.value})} 
           />
         </div>
-        <input
+        
+        <FloatingInput 
+          label="Price ($)" 
           type="number"
-          placeholder="Price ($)"
-          value={metadata.price}
-          onChange={(e) => setMetadata({...metadata, price: e.target.value})}
-          style={inputStyle}
+          value={metadata.price} 
+          onChange={(e) => setMetadata({...metadata, price: e.target.value})} 
         />
-        <input
-          type="text"
-          placeholder="Tags (comma separated)"
-          value={metadata.tags}
-          onChange={(e) => setMetadata({...metadata, tags: e.target.value})}
-          style={inputStyle}
+        
+        <FloatingInput 
+          label="Tags" 
+          value={metadata.tags} 
+          onChange={(e) => setMetadata({...metadata, tags: e.target.value})} 
+          placeholder="Trap, Dark, Piano"
         />
       </div>
 
@@ -248,37 +270,38 @@ const UploadPage = () => {
         disabled={isUploading}
         style={{
           width: '100%',
-          height: '56px',
-          borderRadius: '16px',
+          height: '60px',
+          borderRadius: '20px',
           background: uploadStatus === 'success' ? '#22c55e' : 'var(--accent-primary)',
           color: 'white',
-          fontSize: '16px',
-          fontWeight: 600,
+          fontSize: '17px',
+          fontWeight: 700,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '10px',
-          opacity: isUploading ? 0.7 : 1,
+          gap: '12px',
+          marginTop: '12px',
+          opacity: isUploading ? 0.8 : 1,
+          boxShadow: '0 8px 24px rgba(124, 58, 237, 0.4)',
           transition: 'all 0.3s'
         }}
       >
         {isUploading ? (
           <>
-            <Loader2 className="spin" size={20} /> Uploading...
+            <Loader2 className="spin" size={22} /> Uploading...
           </>
         ) : uploadStatus === 'success' ? (
           <>
-            <Check size={20} /> Done!
+            <Check size={24} /> Uploaded!
           </>
         ) : (
-          'Upload Beat'
+          'Publish Beat'
         )}
       </button>
 
       <style>{`
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        /* Remove arrows from number inputs */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
@@ -287,86 +310,112 @@ const UploadPage = () => {
   );
 };
 
-// Helper Components & Styles
-const UploadSection = ({ title, file, onDrop, onSelect, onRemove, accept, icon, required }) => (
-  <div 
-    onDragOver={(e) => e.preventDefault()}
-    onDrop={onDrop}
-    style={{
-      width: '100%',
-      padding: '20px',
-      borderRadius: '16px',
-      border: '2px dashed var(--glass-border)',
-      background: file ? 'rgba(124, 58, 237, 0.1)' : 'var(--glass-bg)',
-      display: 'flex', alignItems: 'center', gap: '16px',
-      marginBottom: '16px', position: 'relative'
-    }}
-  >
+// Helper Components
+const hiddenInputStyle = { position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', zIndex: 5 };
+
+const UploadSection = ({ title, file, onSelect, onRemove, accept, icon, required }) => (
+  <div style={{
+    position: 'relative',
+    background: file ? 'rgba(124, 58, 237, 0.15)' : 'rgba(255,255,255,0.03)',
+    borderRadius: '20px',
+    padding: '16px',
+    display: 'flex', alignItems: 'center', gap: '16px',
+    border: file ? '1px solid var(--accent-primary)' : '1px solid rgba(255,255,255,0.08)',
+    transition: 'all 0.3s'
+  }}>
     <div style={{
-      width: '48px', height: '48px', borderRadius: '12px',
-      background: file ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center'
+      width: '48px', height: '48px', borderRadius: '14px',
+      background: file ? 'var(--accent-primary)' : 'rgba(255,255,255,0.05)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      color: file ? 'white' : 'var(--text-secondary)'
     }}>
-      {React.cloneElement(icon, { color: file ? 'white' : 'var(--text-secondary)' })}
+      {icon}
     </div>
+    
     <div style={{ flex: 1 }}>
-      <p style={{ fontWeight: 600, fontSize: '14px' }}>
-        {file ? file.name : title} {required && !file && <span style={{color:'red'}}>*</span>}
+      <p style={{ fontWeight: 600, fontSize: '15px', color: 'white' }}>
+        {file ? file.name : title} {required && !file && <span style={{color:'#ef4444'}}>*</span>}
       </p>
-      <p style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>
-        {file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : 'Drag or click to browse'}
+      <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
+        {file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : 'Tap to browse'}
       </p>
     </div>
+    
     <input type="file" accept={accept} onChange={onSelect} style={hiddenInputStyle} />
+    
     {file && (
-      <button onClick={(e) => { e.stopPropagation(); onRemove(); }} style={{ zIndex: 10, padding: '8px' }}>
-        <X size={20} color="var(--text-secondary)" />
+      <button 
+        onClick={(e) => { e.stopPropagation(); onRemove(); }} 
+        style={{ zIndex: 10, padding: '8px', background: 'rgba(0,0,0,0.2)', borderRadius: '50%' }}
+      >
+        <X size={18} color="white" />
       </button>
     )}
   </div>
 );
 
-const FilePreview = ({ file, onRemove, type }) => (
-  <>
-  {type === 'image' && <div style={{
-    position: 'absolute', inset: 0, 
-    background: `url(${URL.createObjectURL(file)}) center/cover`, 
-    zIndex: 1 
-  }} />}
-  <button 
-    onClick={(e) => { e.stopPropagation(); onRemove(); }}
-    style={{
-      position: 'absolute', top: '12px', right: '12px', zIndex: 10,
-      background: 'rgba(0,0,0,0.5)', borderRadius: '50%', padding: '4px', color: 'white'
-    }}
-  >
-    <X size={20} />
-  </button>
-  </>
+const LinkInput = ({ icon, label, value, onChange, placeholder }) => (
+  <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+    <div style={{ 
+      width: '40px', height: '40px', borderRadius: '12px', 
+      background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      color: 'var(--text-secondary)'
+    }}>
+      {icon}
+    </div>
+    <div style={{ flex: 1 }}>
+      <label style={{ display: 'block', marginBottom: '4px', fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 600 }}>
+        {label}
+      </label>
+      <input
+        type="text"
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        style={{
+          width: '100%',
+          background: 'transparent',
+          border: 'none',
+          color: 'var(--accent-cyan)',
+          fontSize: '15px',
+          fontWeight: 500,
+          outline: 'none',
+          padding: 0
+        }}
+      />
+    </div>
+  </div>
 );
 
-const dropZoneStyle = (hasFile) => ({
-  width: '100%',
-  aspectRatio: '1',
-  borderRadius: '24px',
-  border: '2px dashed var(--glass-border)',
-  background: 'var(--glass-bg)',
-  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-  marginBottom: '24px', position: 'relative', overflow: 'hidden'
-});
-
-const hiddenInputStyle = { position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', zIndex: 5 };
-
-const inputStyle = {
-  width: '100%',
-  height: '50px',
-  background: 'var(--bg-secondary)',
-  border: '1px solid var(--glass-border)',
-  borderRadius: '12px',
-  padding: '0 16px',
-  color: 'white',
-  fontSize: '16px',
-  outline: 'none'
-};
+const FloatingInput = ({ label, value, onChange, type = "text", placeholder }) => (
+  <div style={{ position: 'relative', paddingTop: '10px' }}>
+    <label style={{ 
+      position: 'absolute', top: 0, left: 0, 
+      fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' 
+    }}>
+      {label}
+    </label>
+    <input
+      type={type}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      style={{
+        width: '100%',
+        padding: '8px 0',
+        background: 'transparent',
+        border: 'none',
+        borderBottom: '1px solid rgba(255,255,255,0.1)',
+        color: 'white',
+        fontSize: '16px',
+        fontWeight: 500,
+        outline: 'none',
+        transition: 'border-color 0.3s'
+      }}
+      onFocus={(e) => e.target.style.borderBottomColor = 'var(--accent-primary)'}
+      onBlur={(e) => e.target.style.borderBottomColor = 'rgba(255,255,255,0.1)'}
+    />
+  </div>
+);
 
 export default UploadPage;
