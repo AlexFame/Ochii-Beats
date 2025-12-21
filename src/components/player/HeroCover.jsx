@@ -23,19 +23,17 @@ const HeroCover = ({ beat, onNext, onPrev }) => {
       animate={controls}
       style={{
         width: 'calc(100% + 32px)', 
-        marginLeft: '-16px',
-        marginRight: '-16px',
-        marginTop: '-20px', 
+        margin: '-20px -16px 24px -16px',
         aspectRatio: '1',
         borderBottomLeftRadius: '32px',
         borderBottomRightRadius: '32px',
         overflow: 'hidden',
-        marginBottom: '24px',
         boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
         position: 'relative',
         cursor: 'grab',
         touchAction: 'none',
-        zIndex: 0
+        zIndex: 0,
+        flexShrink: 0 // Prevent flex shrinking
       }}>
       <div style={{
         width: '100%',
