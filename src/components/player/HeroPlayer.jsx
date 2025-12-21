@@ -97,10 +97,12 @@ const HeroPlayer = ({ beat, playlist = [] }) => {
         onDragEnd={handleDragEnd}
         animate={controls}
         style={{
-          width: 'calc(100% + 32px)', // Break container padding
-          marginLeft: '-16px',
-          marginRight: '-16px',
-          marginTop: '-20px', // Pull up to cover Layout padding
+          width: '100vw', 
+          maxWidth: '430px', /* Ensure it doesn't exceed app max width */
+          marginLeft: 'calc(50% - 50vw)', /* Center relative to viewport and stretch */
+          marginRight: 'calc(50% - 50vw)',
+          marginTop: '-20px', 
+          transform: 'translateX(calc(50vw - 50%))', /* Correct positioning if parent is centered */
           aspectRatio: '1',
           borderBottomLeftRadius: '32px',
           borderBottomRightRadius: '32px',
@@ -110,7 +112,9 @@ const HeroPlayer = ({ beat, playlist = [] }) => {
           position: 'relative',
           cursor: 'grab',
           touchAction: 'none',
-          zIndex: 0
+          zIndex: 0,
+          left: '50%', /* Force center alignment */
+          right: '50%'
         }}>
         <div style={{
           width: '100%',
