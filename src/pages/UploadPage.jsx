@@ -1,32 +1,6 @@
-import React, { useState, useCallback } from 'react';
-import { Upload, Music, Image as ImageIcon, X, Check, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '../lib/supabase';
 
-const UploadPage = () => {
-  const [coverFile, setCoverFile] = useState(null);
-  const [audioFile, setAudioFile] = useState(null);
-  const [metadata, setMetadata] = useState({
-    title: '',
-    bpm: '',
-    key: '',
-    price: '',
-    tags: ''
-  });
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState(null); // 'success' | 'error'
-
-  const handleDrop = useCallback((e, type) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (type === 'cover' && file?.type.startsWith('image/')) setCoverFile(file);
-    if (type === 'audio' && file?.type.startsWith('audio/')) setAudioFile(file);
-  }, []);
-
-  const handleFileSelect = (e, type) => {
-    const file = e.target.files[0];
-    if (type === 'cover') setCoverFile(file);
-    if (type === 'audio') setAudioFile(file);
-  };
+// ... (inside component)
 
   const handleSubmit = async () => {
     if (!coverFile || !audioFile || !metadata.title || !metadata.price) {
@@ -36,21 +10,64 @@ const UploadPage = () => {
 
     setIsUploading(true);
     
-    // TODO: Implement Supabase Upload Here
-    console.log("Uploading...", { coverFile, audioFile, metadata });
-    
-    // Simulate upload for UI demo
-    setTimeout(() => {
-      setIsUploading(false);
+    try {
+      // 1. Upload Cover
+      const coverExt = coverFile.name.split('.').pop();
+      const coverName = `${Date.now()}_cover.${coverExt}`;
+      const { data: coverData, error: coverError } = await supabase.storage
+        .from('covers')
+        .upload(coverName, coverFile);
+      
+      if (coverError) throw coverError;
+      
+      const { data: { publicUrl: coverUrl } } = supabase.storage
+        .from('covers')
+        .getPublicUrl(coverName);
+
+      // 2. Upload Audio
+      const audioExt = audioFile.name.split('.').pop();
+      const audioName = `${Date.now()}_audio.${audioExt}`;
+      const { data: audioData, error: audioError } = await supabase.storage
+        .from('beats')
+        .upload(audioName, audioFile);
+        
+      if (audioError) throw audioError;
+
+      const { data: { publicUrl: audioUrl } } = supabase.storage
+        .from('beats')
+        .getPublicUrl(audioName);
+
+      // 3. Insert into Database
+      const { error: dbError } = await supabase
+        .from('beats')
+        .insert([{
+          title: metadata.title,
+          bpm: metadata.bpm ? parseInt(metadata.bpm) : null,
+          key: metadata.key,
+          price: parseFloat(metadata.price),
+          tags: metadata.tags.split(',').map(t => t.trim()),
+          cover_url: coverUrl,
+          audio_url: audioUrl
+        }]);
+
+      if (dbError) throw dbError;
+
       setUploadStatus('success');
-      // Reset form after delay
+      
+      // Reset form
       setTimeout(() => {
         setUploadStatus(null);
         setCoverFile(null);
         setAudioFile(null);
         setMetadata({ title: '', bpm: '', key: '', price: '', tags: '' });
       }, 2000);
-    }, 2000);
+
+    } catch (error) {
+      console.error('Upload failed:', error);
+      alert('Upload failed: ' + error.message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
