@@ -18,7 +18,7 @@ const HeroPlayer = ({ beat, playlist = [] }) => {
   const [seekValue, setSeekValue] = useState(0);
 
   // Animation controls for swipe
-  const controls = useAnimation();
+  // const controls = useAnimation();
 
   // If this beat is playing, show its state. Otherwise static.
   const isCurrent = currentTrack?.id === beat.id;
@@ -55,22 +55,16 @@ const HeroPlayer = ({ beat, playlist = [] }) => {
     }}>
       
       {/* Cover Art - Swipe enabled */}
-      <motion.div 
-        drag="x"
-        dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.2}
-        onDragEnd={handleDragEnd}
-        animate={controls}
+      {/* Cover Art - Swipe disabled for debugging */}
+      <div 
         style={{
           width: '100%',
           aspectRatio: '1',
-          borderRadius: '24px', // Keep rounded corners 
+          borderRadius: '24px',
           overflow: 'hidden',
           marginBottom: '20px',
           boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
           position: 'relative',
-          cursor: 'grab',
-          touchAction: 'none' 
         }}>
         <div style={{
           width: '100%',
@@ -78,9 +72,8 @@ const HeroPlayer = ({ beat, playlist = [] }) => {
           backgroundImage: `url(${beat.cover})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          pointerEvents: 'none'
         }} />
-      </motion.div>
+      </div>
 
       {/* Info & Controls Area */}
       <div style={{ flexShrink: 0, width: '100%' }}>
