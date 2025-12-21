@@ -5,7 +5,7 @@ import { useAudio } from '../../context/AudioContext';
 import { useCart } from '../../context/CartContext';
 import LicenseModal from '../marketplace/LicenseModal';
 
-const HeroPlayer = ({ beat }) => {
+const HeroPlayer = ({ beat, playlist = [] }) => {
   const { 
     currentTrack, isPlaying, playTrack, togglePlay, 
     currentTime, duration, seek, isLooping, toggleLoop,
@@ -35,7 +35,7 @@ const HeroPlayer = ({ beat }) => {
     if (isCurrent) {
       togglePlay();
     } else {
-      playTrack(beat);
+      playTrack(beat, playlist);
     }
   };
 
@@ -43,39 +43,7 @@ const HeroPlayer = ({ beat }) => {
     setShowLicense(true);
   };
 
-  const handleSelectLicense = (license) => {
-    addToCart(beat, license);
-    setShowLicense(false);
-  };
-
-  // Format time (mm:ss)
-  const formatTime = (time) => {
-    if (!time) return '0:00';
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  };
-
-  const handleSeekChange = (e) => {
-    setSeekValue(Number(e.target.value));
-  };
-
-  const handleSeekStart = () => setIsSeeking(true);
-  
-  const handleSeekEnd = () => {
-    seek(seekValue);
-    setIsSeeking(false);
-  };
-
-  const handleDragEnd = (event, info) => {
-    const threshold = 100;
-    if (info.offset.x < -threshold) {
-      playNext();
-    } else if (info.offset.x > threshold) {
-      playPrev();
-    }
-    controls.start({ x: 0 });
-  };
+// ... (keep existing helper functions)
 
   return (
     <div style={{ 
@@ -96,7 +64,7 @@ const HeroPlayer = ({ beat }) => {
         style={{
           width: '100%',
           aspectRatio: '1',
-          borderRadius: '24px',
+          borderRadius: '24px', // Keep rounded corners 
           overflow: 'hidden',
           marginBottom: '20px',
           boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
@@ -110,7 +78,7 @@ const HeroPlayer = ({ beat }) => {
           backgroundImage: `url(${beat.cover})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          pointerEvents: 'none' // Let drag handle events
+          pointerEvents: 'none'
         }} />
       </motion.div>
 
@@ -128,8 +96,8 @@ const HeroPlayer = ({ beat }) => {
           </div>
         </div>
 
-        {/* Improved Progress Bar (replacing waveform) */}
-        <div style={{ marginBottom: '24px' }}>
+        {/* Improved Progress Bar */}
+        <div style={{ marginBottom: '32px' }}>
           <input
             type="range"
             min="0"
@@ -151,49 +119,55 @@ const HeroPlayer = ({ beat }) => {
             }}
             className="seek-slider" 
           />
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '12px', color: 'var(--text-secondary)' }}>
             <span>{formatTime(seekValue)}</span>
             <span>{formatTime(duration)}</span>
           </div>
         </div>
 
-        {/* Player Controls Row */}
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '24px', marginBottom: '24px' }}>
+        {/* Player Controls Row - REDESIGNED */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '40px', marginBottom: '32px' }}>
           <button onClick={playPrev} style={{ 
-            width: '48px', height: '48px', borderRadius: '12px', 
-            background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-            color: 'white', backdropFilter: 'blur(10px)'
+             color: 'white', 
+             background: 'transparent',
+             border: 'none',
+             cursor: 'pointer',
+             padding: '10px'
           }}>
-            <SkipBack size={24} fill="currentColor" />
+            <SkipBack size={32} fill="currentColor" />
           </button>
           
           <button 
             onClick={handlePlayClick}
             style={{ 
-              width: '72px', 
-              height: '72px', 
-              borderRadius: '24px', 
+              width: '80px', 
+              height: '80px', 
+              borderRadius: '50%', // Circle
               background: 'white', 
               color: 'black',
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',
-              boxShadow: '0 4px 20px rgba(255,255,255,0.2)'
+              boxShadow: '0 4px 24px rgba(255,255,255,0.25)',
+              border: 'none',
+              cursor: 'pointer'
             }}
           >
             {activePlaying ? (
-              <Pause size={32} fill="currentColor" />
+              <Pause size={36} fill="currentColor" />
             ) : (
-              <Play size={32} fill="currentColor" style={{ marginLeft: '4px' }} />
+              <Play size={36} fill="currentColor" style={{ marginLeft: '4px' }} />
             )}
           </button>
 
           <button onClick={playNext} style={{ 
-            width: '48px', height: '48px', borderRadius: '12px', 
-            background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-            color: 'white', backdropFilter: 'blur(10px)'
+             color: 'white', 
+             background: 'transparent',
+             border: 'none',
+             cursor: 'pointer',
+             padding: '10px'
           }}>
-             <SkipForward size={24} fill="currentColor" />
+             <SkipForward size={32} fill="currentColor" />
           </button>
         </div>
 

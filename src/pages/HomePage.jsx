@@ -73,7 +73,7 @@ const HomePage = () => {
     <div style={{ paddingBottom: '20px' }}>
       
       {/* Hero Section */}
-      <HeroPlayer beat={featuredBeat} />
+      <HeroPlayer beat={featuredBeat} playlist={MOCK_BEATS} />
 
       <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '12px', marginTop: '0', paddingLeft: '8px' }}>More Beats</h3>
       
