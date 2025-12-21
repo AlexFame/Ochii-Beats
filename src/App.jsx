@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 import { AudioProvider } from './context/AudioContext';
 import { CartProvider } from './context/CartContext';
 import CartPage from './pages/CartPage';
+import UploadPage from './pages/UploadPage';
 import ProfilePage from './pages/ProfilePage';
 import { useTelegram } from './hooks/useTelegram';
 
