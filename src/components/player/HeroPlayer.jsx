@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause, SkipBack, SkipForward, ShoppingCart, Share2, Heart, RefreshCw, Volume2, Volume1, VolumeX } from 'lucide-react';
-import { motion, useAnimation, PanInfo } from 'framer-motion';
+import { motion, useAnimation } from 'framer-motion';
 import { useAudio } from '../../context/AudioContext';
 import { useCart } from '../../context/CartContext';
 import LicenseModal from '../marketplace/LicenseModal';
