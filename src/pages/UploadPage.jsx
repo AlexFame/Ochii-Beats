@@ -97,7 +97,7 @@ const UploadPage = () => {
   };
 
   return (
-    <div style={{ paddingBottom: '100px', minHeight: '100vh', padding: '16px' }}>
+    <div style={{ padding: '16px', paddingBottom: '100px', minHeight: '100vh' }}>
       <h1 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '24px' }}>Upload New Beat</h1>
 
       {/* Cover Upload Zone */}

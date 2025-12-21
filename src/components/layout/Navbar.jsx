@@ -21,7 +21,7 @@ const Navbar = () => {
       alignItems: 'center',
       justifyContent: 'center'
     }}>
-      <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', minHeight: 'auto', background: 'transparent', boxShadow: 'none' }}>
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Music2 size={24} color="var(--accent-primary)" />
           <h1 style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '-0.02em' }}>
