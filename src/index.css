@@ -1,34 +1,44 @@
 :root {
-  /* Premium Dark Theme Palette */
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #121212;
-  --bg-tertiary: #1e1e1e;
+  /* iOS 26 Futuristic Palette */
+  --bg-primary: #000000; /* True OLED Black */
+  --bg-secondary: #0f0f11; /* Deep Graphite */
+  --bg-tertiary: #1c1c1e; /* Lighter Graphite */
   
-  --accent-primary: #7c3aed; /* Electric Purple */
-  --accent-secondary: #ec4899; /* Hot Pink */
-  --accent-gradient: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  /* Neon Vibrancy */
+  --accent-primary: #6d28d9; /* Deep Electric Purple */
+  --accent-secondary: #d946ef; /* Neon Magenta */
+  --accent-cyan: #06b6d4; /* Cyber Cyan */
+  --accent-gradient: linear-gradient(135deg, #7c3aed 0%, #d946ef 50%, #f472b6 100%);
+  --glass-gradient: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
   
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.6);
-  --text-tertiary: rgba(255, 255, 255, 0.4);
+  --text-secondary: rgba(255, 255, 255, 0.55);
+  --text-tertiary: rgba(255, 255, 255, 0.35);
   
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-blur: 12px;
+  /* Ultra Glass */
+  --glass-bg: rgba(20, 20, 22, 0.65); /* Darker, more substantial glass */
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shine: rgba(255, 255, 255, 0.05);
+  --glass-blur: 24px; /* Heavy blur */
+  --glass-saturate: 180%; /* Vibrant transparency */
   
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  /* Modern Shapes */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
   --radius-full: 9999px;
   
-  --header-height: 60px;
-  --player-height: 80px;
-  --bottom-nav-height: 70px;
+  /* Dimensions */
+  --header-height: 56px;
+  --player-height: 84px;
+  --bottom-nav-height: 88px; /* Taller area for floating dock */
   
-  --safe-area-top: env(safe-area-inset-top, 0px);
-  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-top: env(safe-area-inset-top, 20px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 20px);
   
   --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy physics */
 }
 
 * {
@@ -36,6 +46,7 @@
   margin: 0;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 html, body {
@@ -43,65 +54,68 @@ html, body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.5;
-  overflow-x: hidden; /* CRITICAL: Prevent horizontal scroll */
+  overflow-x: hidden;
   width: 100%;
   position: relative;
-  /* Smooth scrolling */
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Scrollbar */
+/* Hide Scrollbar but allow scroll */
 ::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
+  width: 0px;
   background: transparent;
 }
-::-webkit-scrollbar-thumb {
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-full);
-}
 
-/* Utilities */
+/* iOS 26 Utilities */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
 .text-gradient {
   background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
+.glow-effect {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+}
+
+/* Mobile Constraint Container */
 .container {
-  max-width: 430px; /* Restrict to mobile width */
-  margin: 0 auto;   /* Center on desktop */
-  padding: 0 16px;
+  max-width: 440px; /* iPhone Pro Max width */
+  margin: 0 auto;
+  padding: 0 20px;
   width: 100%;
   min-height: 100vh;
   position: relative;
-  background-color: var(--bg-primary); /* Ensure background is within the phone frame */
-  box-shadow: 0 0 50px rgba(0,0,0,0.5); /* Shadow to separate from void on desktop */
+  background-color: var(--bg-primary);
+  box-shadow: 0 0 60px rgba(0,0,0,0.8);
+  overflow: hidden; /* Clip contents for rounded feel on desktop if we wanted, but standard square is fine */
 }
 
-/* Ensure fixed elements also respect the width */
-.glass-panel[style*="fixed"] {
-  max-width: 430px;
+/* Fixed Elements Constraint */
+.fixed-island {
+  position: fixed;
   left: 50% !important;
   transform: translateX(-50%);
-  right: auto !important;
+  width: 100%;
+  max-width: 440px;
+  z-index: 100;
 }
 
-/* Fix for fixed bottom elements */
+/* Ensure fixed bottom elements respect mobile width */
 div[style*="fixed"][style*="bottom: 0"] {
-  max-width: 430px;
+  max-width: 440px;
   left: 50% !important;
   transform: translateX(-50%);
-  right: auto !important;
   width: 100%;
 }
 
@@ -111,9 +125,23 @@ button {
   cursor: pointer;
   font-family: inherit;
   color: inherit;
+  user-select: none;
 }
 
 a {
   text-decoration: none;
   color: inherit;
+}
+
+/* Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 10px rgba(124, 58, 237, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(217, 70, 239, 0.5); }
+  100% { box-shadow: 0 0 10px rgba(124, 58, 237, 0.2); }
 }
