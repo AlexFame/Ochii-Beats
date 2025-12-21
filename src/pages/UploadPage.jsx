@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Upload, Music, FileAudio, FolderArchive, Image as ImageIcon, X, Check, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
