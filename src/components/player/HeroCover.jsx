@@ -22,8 +22,8 @@ const HeroCover = ({ beat, onNext, onPrev }) => {
       onDragEnd={handleDragEnd}
       animate={controls}
       style={{
-        width: 'calc(100% + 32px)', 
-        margin: '-20px -16px 24px -16px',
+        width: '100%', 
+        marginBottom: '24px',
         aspectRatio: '1',
         borderBottomLeftRadius: '32px',
         borderBottomRightRadius: '32px',

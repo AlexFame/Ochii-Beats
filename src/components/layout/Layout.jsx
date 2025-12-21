@@ -14,7 +14,7 @@ const Layout = () => {
       paddingBottom: 'calc(var(--player-height) + var(--bottom-nav-height) + 20px)' 
     }}>
       <Navbar />
-      <main className="container" style={{ paddingTop: isHome ? '20px' : 'var(--header-height)' }}>
+      <main className="container" style={{ paddingTop: isHome ? '0' : 'var(--header-height)' }}>
         <Outlet />
       </main>
       
