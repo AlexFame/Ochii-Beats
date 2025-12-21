@@ -8,7 +8,6 @@ const AudioPlayerBar = () => {
   if (!currentTrack) return null;
 
   return (
-  return (
     <div style={{
       position: 'fixed',
       bottom: '108px', // 24px (nav bottom) + 72px (nav height) + 12px (gap)
