@@ -96,8 +96,8 @@ const HeroPlayer = ({ beat }) => {
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '24px', marginBottom: '20px' }}>
           <button style={{ 
             width: '48px', height: '48px', borderRadius: '12px', 
-            background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            border: '1px solid var(--glass-border)'
+            background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', // Lighter background
+            color: 'white'
           }}>
             <SkipBack size={24} fill="currentColor" />
           </button>
@@ -108,8 +108,8 @@ const HeroPlayer = ({ beat }) => {
               width: '64px', 
               height: '64px', 
               borderRadius: '20px', 
-              background: 'var(--text-primary)', 
-              color: 'var(--bg-primary)',
+              background: 'white', // Keep play button white for max contrast
+              color: 'black',
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',
@@ -125,8 +125,8 @@ const HeroPlayer = ({ beat }) => {
 
           <button style={{ 
             width: '48px', height: '48px', borderRadius: '12px', 
-            background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            border: '1px solid var(--glass-border)'
+            background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', // Lighter background
+            color: 'white'
           }}>
              <SkipForward size={24} fill="currentColor" />
           </button>
@@ -138,17 +138,18 @@ const HeroPlayer = ({ beat }) => {
           style={{
             width: '100%',
             height: '56px',
-            borderRadius: '28px', // Pill shape
-            background: '#0a0a0a', // Black
+            borderRadius: '28px', 
+            background: 'var(--accent-primary)', // Purple accent
             color: 'white',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '18px',
-            fontWeight: 600,
-            border: '1px solid rgba(255,255,255,0.2)',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            marginBottom: '16px'
+            fontWeight: 700,
+            boxShadow: '0 4px 20px rgba(124, 58, 237, 0.4)', // Purple glow
+            marginBottom: '16px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px'
           }}
         >
           Buy from ${beat.price}
