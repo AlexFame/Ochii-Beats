@@ -6,8 +6,6 @@ const UploadPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [coverFile, setCoverFile] = useState(null);
   const [mp3File, setMp3File] = useState(null);
-  const [wavFile, setWavFile] = useState(null);
-  const [zipFile, setZipFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null);
   
@@ -16,7 +14,9 @@ const UploadPage = () => {
     bpm: '',
     key: '',
     price: '',
-    tags: ''
+    tags: '',
+    wavLink: '',
+    zipLink: ''
   });
 
   // Check for admin session on mount
@@ -34,8 +34,6 @@ const UploadPage = () => {
 
     if (type === 'cover' && file.type.startsWith('image/')) setCoverFile(file);
     if (type === 'mp3' && (file.type === 'audio/mpeg' || file.name.endsWith('.mp3'))) setMp3File(file);
-    if (type === 'wav' && (file.type === 'audio/wav' || file.name.endsWith('.wav'))) setWavFile(file);
-    if (type === 'zip' && (file.type === 'application/zip' || file.type.includes('compressed') || file.name.endsWith('.zip'))) setZipFile(file);
   }, []);
 
   const handleFileSelect = (e, type) => {
@@ -44,8 +42,6 @@ const UploadPage = () => {
 
     if (type === 'cover') setCoverFile(file);
     if (type === 'mp3') setMp3File(file);
-    if (type === 'wav') setWavFile(file);
-    if (type === 'zip') setZipFile(file);
   };
 
   if (!isAuthenticated) {
@@ -86,15 +82,13 @@ const UploadPage = () => {
     setIsUploading(true);
     
     try {
-      // 1. Upload All Files Parallely
+      // 1. Upload Only Media Files
       const uploadPromises = [
         uploadFileToStorage(coverFile, 'covers', 'art_'),
-        uploadFileToStorage(mp3File, 'beats', 'mp3_'),
-        uploadFileToStorage(wavFile, 'beats', 'wav_'),
-        uploadFileToStorage(zipFile, 'beats', 'stems_')
+        uploadFileToStorage(mp3File, 'beats', 'mp3_')
       ];
 
-      const [coverUrl, mp3Url, wavUrl, stemsUrl] = await Promise.all(uploadPromises);
+      const [coverUrl, mp3Url] = await Promise.all(uploadPromises);
 
       // 2. Insert into Database
       const { error: dbError } = await supabase
@@ -107,8 +101,8 @@ const UploadPage = () => {
           tags: metadata.tags ? metadata.tags.split(',').map(t => t.trim()) : [],
           cover_url: coverUrl,
           audio_url: mp3Url,   // Main preview/MP3
-          wav_url: wavUrl,     // Untagged WAV
-          stems_url: stemsUrl  // Trackouts ZIP
+          wav_url: metadata.wavLink,     // Telegram Link
+          stems_url: metadata.zipLink  // Telegram Link
         }]);
 
       if (dbError) throw dbError;
@@ -120,9 +114,7 @@ const UploadPage = () => {
         setUploadStatus(null);
         setCoverFile(null);
         setMp3File(null);
-        setWavFile(null);
-        setZipFile(null);
-        setMetadata({ title: '', bpm: '', key: '', price: '', tags: '' });
+        setMetadata({ title: '', bpm: '', key: '', price: '', tags: '', wavLink: '', zipLink: '' });
       }, 2000);
 
     } catch (error) {
@@ -165,27 +157,49 @@ const UploadPage = () => {
         required
       />
 
-      {/* WAV Upload (Optional) */}
-      <UploadSection 
-        title="WAV (Untagged)" 
-        file={wavFile} 
-        onDrop={(e) => handleDrop(e, 'wav')} 
-        onSelect={(e) => handleFileSelect(e, 'wav')} 
-        onRemove={() => setWavFile(null)}
-        accept="audio/wav,.wav"
-        icon={<FileAudio size={24} />}
-      />
+      {/* WAV Link (Telegram) */}
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+          WAV Source (Telegram Link / File ID)
+        </label>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div style={{ 
+            width: '48px', height: '48px', borderRadius: '12px', 
+            background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' 
+          }}>
+            <FileAudio size={24} color="var(--text-secondary)" />
+          </div>
+          <input
+            type="text"
+            placeholder="Paste Telegram Link or File ID here..."
+            value={metadata.wavLink}
+            onChange={(e) => setMetadata({...metadata, wavLink: e.target.value})}
+            style={inputStyle}
+          />
+        </div>
+      </div>
 
-      {/* ZIP/Stems Upload (Optional) */}
-      <UploadSection 
-        title="Trackouts (ZIP)" 
-        file={zipFile} 
-        onDrop={(e) => handleDrop(e, 'zip')} 
-        onSelect={(e) => handleFileSelect(e, 'zip')} 
-        onRemove={() => setZipFile(null)}
-        accept=".zip,application/zip,application/x-zip-compressed"
-        icon={<FolderArchive size={24} />}
-      />
+      {/* ZIP Link (Telegram) */}
+      <div style={{ marginBottom: '32px' }}>
+        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+          Trackouts/ZIP Source (Telegram Link / File ID)
+        </label>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div style={{ 
+            width: '48px', height: '48px', borderRadius: '12px', 
+            background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' 
+          }}>
+            <FolderArchive size={24} color="var(--text-secondary)" />
+          </div>
+          <input
+            type="text"
+            placeholder="Paste Telegram Link or File ID here..."
+            value={metadata.zipLink}
+            onChange={(e) => setMetadata({...metadata, zipLink: e.target.value})}
+            style={inputStyle}
+          />
+        </div>
+      </div>
 
       {/* Metadata Form */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '32px' }}>
