@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 import BeatCard from '../components/marketplace/BeatCard';
 import HeroPlayer from '../components/player/HeroPlayer';
 import { useAudio } from '../context/AudioContext';
@@ -7,7 +8,6 @@ const MOCK_BEATS = [
   {
     id: 1,
     title: 'Midnight Drive',
-    producer: 'Prod. SkyHigh',
     bpm: 140,
     key: 'Cm',
     price: 29.99,
@@ -18,7 +18,6 @@ const MOCK_BEATS = [
   {
     id: 2,
     title: 'Summer Vibes',
-    producer: 'BeatsByDre (Fake)',
     bpm: 98,
     key: 'Gmaj',
     price: 35.00,
@@ -29,58 +28,73 @@ const MOCK_BEATS = [
   {
     id: 3,
     title: 'Hard Hitter',
-    producer: '808MafiaClone',
     bpm: 155,
     key: 'F#m',
     price: 19.99,
     cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&h=600&fit=crop',
     tags: ['Drill', 'Aggressive', 'UK'],
     audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
-  },
-  {
-    id: 4,
-    title: 'Neon Pulse',
-    producer: 'SynthWaveKing',
-    bpm: 128,
-    key: 'Am',
-    price: 24.99,
-    cover: 'https://images.unsplash.com/photo-1534361960057-19889db9621e?w=600&h=600&fit=crop',
-    tags: ['Synthwave', 'Retro', '80s'],
-    audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'
   }
 ];
 
 const HomePage = () => {
-  const { currentTrack } = useAudio();
-  const [featuredBeat, setFeaturedBeat] = useState(MOCK_BEATS[0]);
+  const [beats, setBeats] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sync featured beat with global player if something is playing
   useEffect(() => {
-    if (currentTrack) {
-      // Find full beat object if needed, or just use currentTrack
-      const found = MOCK_BEATS.find(b => b.id === currentTrack.id);
-      if (found) setFeaturedBeat(found);
-    }
-  }, [currentTrack]);
+    fetchBeats();
+  }, []);
 
-  const handleHeroPlay = (beat) => {
-    // Pass the full list so "Next" works
-    // Logic inside HeroPlayer will handle this if we pass the list as prop or context
-    // But better to update HeroPlayer to accept playlist or just updating it here
+  const fetchBeats = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('beats')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      if (!data || data.length === 0) {
+        setBeats(MOCK_BEATS);
+      } else {
+        setBeats(data);
+      }
+    } catch (error) {
+      console.error('Error fetching beats:', error);
+      setBeats(MOCK_BEATS);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        paddingBottom: '100px',
+        color: 'var(--text-secondary)'
+      }}>
+        Loading...
+      </div>
+    );
+  }
+
+  const heroBeat = beats.length > 0 ? beats[0] : MOCK_BEATS[0];
 
   return (
     <div style={{ paddingBottom: '20px' }}>
+      <HeroPlayer beat={heroBeat} playlist={beats} />
       
-      {/* Hero Section */}
-      <HeroPlayer beat={featuredBeat} playlist={MOCK_BEATS} />
-
-      <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '12px', marginTop: '0', paddingLeft: '8px' }}>More Beats</h3>
-      
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '20px' }}>
-        {MOCK_BEATS.map(beat => (
-          <BeatCard key={beat.id} beat={beat} playlist={MOCK_BEATS} />
-        ))}
+      <div className="container" style={{ marginTop: '0', padding: '0 16px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '12px', marginTop: '0' }}>More Beats</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '20px' }}>
+          {beats.slice(1).map(beat => (
+            <BeatCard key={beat.id} beat={beat} playlist={beats} />
+          ))}
+        </div>
       </div>
     </div>
   );
